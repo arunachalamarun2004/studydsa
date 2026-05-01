@@ -1,7 +1,70 @@
-// ============================================================
-//  DSA Problem Checklist — 400 Problems — app.js
-// ============================================================
 
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+body{font-family:'Syne',sans-serif;background:transparent}
+:root{
+  --ink:#0a0a0a;--ink2:#444;--ink3:#888;
+  --surface:#ffffff;--surface2:#f5f5f3;--surface3:#eeecea;
+  --border:#e0ddd8;--border2:#ccc9c3;
+  --accent:#1a1a1a;--star:#b8860b;
+  --easy-bg:#e8f5e9;--easy-txt:#1b5e20;
+  --med-bg:#fff3e0;--med-txt:#e65100;
+  --hard-bg:#fce4ec;--hard-txt:#880e4f;
+  --mono:'JetBrains Mono',monospace;
+}
+.root{padding:1rem 0}
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1.2rem}
+.title{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-0.5px}
+.subtitle{font-size:12px;color:var(--ink3);margin-top:2px}
+.stats-row{display:flex;gap:8px;flex-wrap:wrap}
+.stat-pill{font-size:12px;font-family:var(--mono);padding:4px 12px;border-radius:99px;border:1px solid var(--border2);color:var(--ink2);background:var(--surface2)}
+.stat-pill span{font-weight:700;color:var(--ink)}
+.topic-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:1.2rem;border-bottom:1px solid var(--border);padding-bottom:10px}
+.tab{font-size:12px;font-weight:600;padding:5px 12px;border-radius:6px;border:1px solid transparent;cursor:pointer;background:transparent;color:var(--ink3);transition:all .15s;font-family:'Syne',sans-serif}
+.tab:hover{background:var(--surface2);color:var(--ink2)}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.topic-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.topic-title{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-0.3px}
+.topic-meta{display:flex;align-items:center;gap:8px}
+.topic-pbar-wrap{width:120px;height:6px;background:var(--surface3);border-radius:99px;overflow:hidden}
+.topic-pbar{height:100%;background:var(--ink);border-radius:99px;transition:width .3s}
+.topic-pct{font-size:12px;font-family:var(--mono);color:var(--ink3)}
+.pattern-block{margin-bottom:14px}
+.pattern-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;padding:3px 8px;background:var(--surface3);border-radius:4px;display:inline-block}
+.prob-row{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px;cursor:pointer;transition:background .1s;border:1px solid transparent;margin-bottom:3px}
+.prob-row:hover{background:var(--surface2);border-color:var(--border)}
+.prob-row.solved{opacity:.55}
+.prob-row.solved .prob-name{text-decoration:line-through;color:var(--ink3)}
+.cb{width:15px;height:15px;accent-color:var(--ink);flex-shrink:0;cursor:pointer}
+.prob-num{font-size:11px;font-family:var(--mono);color:var(--ink3);min-width:36px}
+.prob-name{font-size:13px;color:var(--ink);flex:1;font-weight:500}
+.star{font-size:12px;color:var(--star);margin-right:2px}
+.diff{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;font-family:var(--mono);flex-shrink:0}
+.E{background:var(--easy-bg);color:var(--easy-txt)}
+.M{background:var(--med-bg);color:var(--med-txt)}
+.H{background:var(--hard-bg);color:var(--hard-txt)}
+.reset-btn{font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--ink3);cursor:pointer;font-family:'Syne',sans-serif}
+.reset-btn:hover{background:var(--surface2)}
+</style>
+
+<div class="root">
+<h2 class="sr-only">400 curated DSA problems across 8 topics with difficulty and must-do markers</h2>
+<div class="topbar">
+  <div><div class="title">DSA Problem Checklist</div><div class="subtitle">400 problems · 8 topics · Java · Infosys SP/DSE</div></div>
+  <div class="stats-row">
+    <div class="stat-pill">Solved: <span id="s-solved">0</span> / 400</div>
+    <div class="stat-pill">Must-do: <span id="s-star">0</span> / 80</div>
+    <div class="stat-pill">Progress: <span id="s-pct">0%</span></div>
+    <button class="reset-btn" onclick="resetAll()">Reset all</button>
+  </div>
+</div>
+<div class="topic-tabs" id="tabs"></div>
+<div id="topic-view"></div>
+</div>
+
+<script>
 const DATA = [
 {
   name:"Arrays", short:"Arrays",
@@ -525,282 +588,101 @@ const DATA = [
 }
 ];
 
-// ---- State ----
-let ck = {};
-let curTopic = 0;
-let currentUser = '';
+let ck={};
+try{ck=JSON.parse(localStorage.getItem('p400')||'{}')}catch(e){}
+function save(){try{localStorage.setItem('p400',JSON.stringify(ck))}catch(e){}}
 
-const BUCKET_ID = 'D5muCX1tMoaq7Rv7ExRdSi'; 
-const LB_API = `https://kvdb.io/${BUCKET_ID}/leaderboard_400`;
+let cur=0;
 
-// ---- Init ----
-async function init() {
-  try { ck = JSON.parse(localStorage.getItem('dsa400_ck') || '{}'); } catch(e) { ck = {}; }
-  currentUser = localStorage.getItem('dsa400_user') || '';
-
-  if (!currentUser) {
-    showNameModal();
-  } else {
-    setUserChip(currentUser);
-  }
-
-  buildNav();
-  renderTopic();
-  updateStats();
+function allProbs(ti){
+  return DATA[ti].patterns.flatMap(p=>p.problems);
 }
+function key(ti,pi,i){return ti+'-'+pi+'-'+i;}
 
-// ---- Persist ----
-function save() {
-  try { localStorage.setItem('dsa400_ck', JSON.stringify(ck)); } catch(e) {}
-  saveToLeaderboard();
-}
-
-// ---- Progress calculation ----
-function calcOverallPct() {
-  let total = 400; // Fixed total
-  let done = 0;
-  DATA.forEach((t, ti) => {
-    t.patterns.forEach((p, pi) => {
-      p.problems.forEach((prob, i) => {
-        if (ck[ti + '-' + pi + '-' + i]) done++;
+function updateGlobal(){
+  let solved=0,star=0,totalStar=0;
+  DATA.forEach((t,ti)=>{
+    t.patterns.forEach((p,pi)=>{
+      p.problems.forEach((prob,i)=>{
+        if(ck[key(ti,pi,i)])solved++;
+        if(prob.star){totalStar++;if(ck[key(ti,pi,i)])star++;}
       });
     });
   });
-  return Math.round(done / total * 100);
+  document.getElementById('s-solved').textContent=solved;
+  document.getElementById('s-star').textContent=star;
+  document.getElementById('s-pct').textContent=Math.round(solved/400*100)+'%';
 }
 
-function getTopicProgress(ti) {
-  let total = 50; // Each topic has 50 problems in this dataset
-  let done = 0;
-  DATA[ti].patterns.forEach((p, pi) => {
-    p.problems.forEach((prob, i) => {
-      if (ck[ti + '-' + pi + '-' + i]) done++;
-    });
-  });
-  return { done, total, pct: Math.round(done / total * 100) };
-}
-
-// ---- Stats bar ----
-function updateStats() {
-  let total = 400, solved = 0, mustDone = 0, totalMust = 0;
-  DATA.forEach((t, ti) => {
-    t.patterns.forEach((p, pi) => {
-      p.problems.forEach((prob, i) => {
-        if (prob.star) totalMust++;
-        if (ck[ti + '-' + pi + '-' + i]) {
-          solved++;
-          if (prob.star) mustDone++;
-        }
-      });
-    });
-  });
-  
-  document.getElementById('tasks-done').textContent = solved;
-  document.getElementById('probs-done').textContent = mustDone; // Using "problems solved" slot for "must-do"
-  document.querySelector('#stat-day .stat-label').textContent = "Must-Do Done";
-  document.getElementById('cur-day').textContent = mustDone + '/' + totalMust;
-  
-  const pct = calcOverallPct();
-  document.getElementById('ovr-pct').textContent = pct + '%';
-  document.getElementById('global-bar').style.width = pct + '%';
-}
-
-// ---- Navigation ----
-function buildNav() {
-  const c = document.getElementById('day-nav');
-  c.innerHTML = '';
-  DATA.forEach((t, i) => {
-    const btn = document.createElement('button');
-    let cls = 'dn';
-    if (i === curTopic) cls += ' on';
-    const prog = getTopicProgress(i);
-    if (prog.done === prog.total) cls += ' comp';
-    
-    btn.className = cls;
-    btn.innerHTML = `${t.short}<br><small style="font-size:9px;opacity:0.8">${prog.done}/${prog.total}</small>`;
-    btn.onclick = () => { curTopic = i; buildNav(); renderTopic(); };
+function buildTabs(){
+  const c=document.getElementById('tabs');c.innerHTML='';
+  DATA.forEach((t,i)=>{
+    const btn=document.createElement('button');
+    btn.className='tab'+(i===cur?' on':'');
+    const probs=allProbs(i);
+    const done=probs.filter((_,j)=>{
+      let found=false;
+      let idx=0;
+      t.patterns.forEach((p,pi)=>p.problems.forEach((_,ii)=>{if(idx===j&&!found){if(ck[key(i,pi,ii)])found=true;}idx++;}));
+      return found;
+    }).length;
+    btn.textContent=t.short+' ('+done+'/50)';
+    btn.onclick=()=>{cur=i;buildTabs();renderTopic();};
     c.appendChild(btn);
   });
 }
 
-// ---- Render Topic ----
-function renderTopic() {
-  const t = DATA[curTopic];
-  const prog = getTopicProgress(curTopic);
-  
-  let html = `
-    <div class="day-card">
-      <div class="day-header">
-        <div>
-          <div class="day-title">${t.name}</div>
-          <div class="day-topic"><span class="badge b-purple">${prog.done}/${prog.total} Problems Solved</span></div>
-        </div>
-      </div>
-      
-      <div class="pbar-wrap" style="margin-bottom:24px">
-        <div class="pbar" style="width:${prog.pct}%"></div>
-      </div>`;
+function renderTopic(){
+  const t=DATA[cur];
+  const probs=allProbs(cur);
+  let solved=0;
+  t.patterns.forEach((p,pi)=>p.problems.forEach((_,i)=>{if(ck[key(cur,pi,i)])solved++;}));
+  const pct=Math.round(solved/50*100);
 
-  t.patterns.forEach((p, pi) => {
-    html += `
-      <div class="section-block">
-        <div class="sec-title">${p.label}</div>
-        <div class="task-list">`;
-    
-    p.problems.forEach((prob, i) => {
-      const isDone = !!ck[curTopic + '-' + pi + '-' + i];
-      html += `
-        <label class="task${isDone ? ' done' : ''}">
-          <input type="checkbox" ${isDone ? 'checked' : ''} onchange="tog(${pi},${i},this)">
-          <span style="font-family:monospace; font-size:11px; color:#888; min-width:35px">#${prob.lc}</span>
-          <span style="flex:1">${prob.star ? '<span style="color:#f59e0b; margin-right:4px">⭐</span>' : ''}${prob.n}</span>
-          <span class="prob-diff ${prob.d}">${prob.d === 'E' ? 'Easy' : prob.d === 'M' ? 'Med' : 'Hard'}</span>
-        </label>`;
+  let html=`<div class="topic-header">
+    <div class="topic-title">${t.name}</div>
+    <div class="topic-meta">
+      <div class="topic-pbar-wrap"><div class="topic-pbar" style="width:${pct}%"></div></div>
+      <span class="topic-pct">${solved}/50 (${pct}%)</span>
+    </div>
+  </div>`;
+
+  t.patterns.forEach((p,pi)=>{
+    html+=`<div class="pattern-block"><span class="pattern-label">${p.label}</span>`;
+    p.problems.forEach((prob,i)=>{
+      const k=key(cur,pi,i);
+      const done=!!ck[k];
+      html+=`<div class="prob-row${done?' solved':''}" onclick="togRow(${cur},${pi},${i},this)">
+        <input type="checkbox" class="cb" ${done?'checked':''} onclick="event.stopPropagation();togRow(${cur},${pi},${i},this.closest('.prob-row'))">
+        <span class="prob-num">#${prob.lc}</span>
+        <span class="prob-name">${prob.star?'<span class="star">⭐</span>':''} ${prob.n}</span>
+        <span class="diff ${prob.d}">${prob.d==='E'?'Easy':prob.d==='M'?'Medium':'Hard'}</span>
+      </div>`;
     });
-    
-    html += `</div></div>`;
+    html+=`</div>`;
   });
 
-  html += `</div>`;
-  
-  // Topic navigation
-  const prev = curTopic > 0
-    ? `<button class="nav-btn" onclick="goTopic(${curTopic-1})">← ${DATA[curTopic-1].short}</button>` : '';
-  const next = curTopic < DATA.length - 1
-    ? `<button class="nav-btn" onclick="goTopic(${curTopic+1})">${DATA[curTopic+1].short} →</button>` : '';
-  
-  html += `<div class="nav-btns">${prev}${next}</div>`;
-  
-  document.getElementById('day-content').innerHTML = html;
+  document.getElementById('topic-view').innerHTML=html;
 }
 
-// ---- Toggle checkbox ----
-function tog(pi, i, el) {
-  const key = curTopic + '-' + pi + '-' + i;
-  ck[key] = el.checked;
-  save();
-  
-  const lbl = el.closest('.task');
-  lbl.classList.toggle('done', el.checked);
-
-  // Update progress bar inline
-  const prog = getTopicProgress(curTopic);
-  const bar = document.querySelector('.day-card .pbar');
-  if (bar) bar.style.width = prog.pct + '%';
-  
-  updateStats();
-  buildNav();
+function togRow(ti,pi,i,row){
+  const k=key(ti,pi,i);
+  ck[k]=!ck[k];save();
+  const cb=row.querySelector('.cb');
+  if(cb)cb.checked=ck[k];
+  row.classList.toggle('solved',ck[k]);
+  updateGlobal();buildTabs();
+  const probs=allProbs(ti);
+  let solved=0;
+  DATA[ti].patterns.forEach((p,pp)=>p.problems.forEach((_,ii)=>{if(ck[key(ti,pp,ii)])solved++;}));
+  const pct=Math.round(solved/50*100);
+  const bar=document.querySelector('.topic-pbar');if(bar)bar.style.width=pct+'%';
+  const pctEl=document.querySelector('.topic-pct');if(pctEl)pctEl.textContent=solved+'/50 ('+pct+'%)';
 }
 
-function goTopic(i) { curTopic = i; buildNav(); renderTopic(); }
-
-// ---- Leaderboard (Global via KVDB.io) ----
-async function getLeaderboard() {
-  try {
-    const res = await fetch(LB_API);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-  } catch(e) {
-    return JSON.parse(localStorage.getItem('dsa400_lb_fallback') || '[]');
-  }
+function resetAll(){
+  ck={};save();buildTabs();renderTopic();updateGlobal();
 }
 
-async function saveToLeaderboard() {
-  if (!currentUser) return;
-  const pct = calcOverallPct();
-  let lb = await getLeaderboard();
-  const idx = lb.findIndex(u => u.name.toLowerCase() === currentUser.toLowerCase());
-  if (idx >= 0) {
-    if (lb[idx].pct >= pct) return;
-    lb[idx].pct = pct;
-    lb[idx].updated = Date.now();
-  } else {
-    lb.push({ name: currentUser, pct, updated: Date.now() });
-  }
-  lb.sort((a,b) => b.pct - a.pct);
-  lb = lb.slice(0, 50); 
-  try {
-    await fetch(LB_API, { method: 'POST', body: JSON.stringify(lb) });
-    localStorage.setItem('dsa400_lb_fallback', JSON.stringify(lb));
-  } catch(e) {}
-}
-
-async function openLeaderboard() {
-  renderLeaderboardSkeleton();
-  document.getElementById('lb-backdrop').classList.add('show');
-  const modal = document.getElementById('lb-modal');
-  modal.style.display = 'block';
-  requestAnimationFrame(() => modal.classList.add('show'));
-  await saveToLeaderboard();
-  await renderLeaderboard();
-}
-
-function renderLeaderboardSkeleton() {
-  document.getElementById('lb-list').innerHTML = '<div class="lb-empty">Loading rankings... ⏳</div>';
-}
-
-async function renderLeaderboard() {
-  const lb = await getLeaderboard();
-  const list = document.getElementById('lb-list');
-  if (!lb.length) {
-    list.innerHTML = '<div class="lb-empty">No entries yet. Be the first! 🚀</div>';
-    return;
-  }
-  const medals = ['🥇','🥈','🥉'];
-  list.innerHTML = lb.slice(0, 10).map((u, i) => {
-    const isMe = currentUser && u.name.toLowerCase() === currentUser.toLowerCase();
-    const initial = u.name.charAt(0).toUpperCase();
-    return `
-      <div class="lb-row${isMe ? ' me' : ''}">
-        <div class="lb-rank">${medals[i] || (i+1)}</div>
-        <div class="lb-avatar">${initial}</div>
-        <div class="lb-name${isMe ? ' me-label' : ''}">${escHtml(u.name)}</div>
-        <div class="lb-bar-wrap"><div class="lb-bar" style="width:${u.pct}%"></div></div>
-        <div class="lb-pct">${u.pct}%</div>
-      </div>`;
-  }).join('');
-}
-
-// ---- Name modal ----
-function showNameModal() {
-  document.getElementById('name-backdrop').classList.add('show');
-  const modal = document.getElementById('name-modal');
-  modal.style.display = 'block';
-  requestAnimationFrame(() => modal.classList.add('show'));
-  setTimeout(() => document.getElementById('name-input').focus(), 250);
-}
-
-function submitName() {
-  const val = document.getElementById('name-input').value.trim();
-  if (!val) return;
-  currentUser = val;
-  localStorage.setItem('dsa400_user', val);
-  setUserChip(val);
-  saveToLeaderboard();
-  document.getElementById('name-backdrop').classList.remove('show');
-  document.getElementById('name-modal').classList.remove('show');
-  setTimeout(() => document.getElementById('name-modal').style.display = '', 200);
-}
-
-function closeLeaderboard() {
-  document.getElementById('lb-backdrop').classList.remove('show');
-  document.getElementById('lb-modal').classList.remove('show');
-  setTimeout(() => document.getElementById('lb-modal').style.display = '', 200);
-}
-
-function changeUser() {
-  document.getElementById('name-input').value = currentUser;
-  showNameModal();
-}
-
-function setUserChip(name) {
-  document.getElementById('user-display').textContent = name;
-  document.getElementById('user-avatar').textContent  = name.charAt(0).toUpperCase();
-}
-
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-init();
+buildTabs();renderTopic();updateGlobal();
+</script>

@@ -211,34 +211,35 @@ body {
 
 /* ============ DAY NAV ============ */
 .day-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
   margin-bottom: 22px;
 }
 
 .dn {
-  padding: 6px 12px;
+  padding: 10px 8px;
   border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-md);
   background: var(--white);
-  color: var(--gray-500);
+  color: var(--gray-700);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all .16s;
   font-family: inherit;
-  min-width: 46px;
   text-align: center;
+  line-height: 1.2;
 }
+.dn small { display: block; margin-top: 4px; font-weight: 400; color: var(--gray-500); }
 .dn:hover { border-color: var(--orange-300); color: var(--orange-600); transform: translateY(-1px); }
 .dn.on {
   background: var(--orange-500);
   color: white;
   border-color: var(--orange-500);
   box-shadow: 0 2px 8px rgba(249,115,22,.35);
-  font-weight: 600;
 }
+.dn.on small { color: rgba(255,255,255,0.8); }
 .dn.comp {
   background: #ecfdf5;
   color: #047857;
