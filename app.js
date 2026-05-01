@@ -530,8 +530,8 @@ let ck = {};
 let curTopic = 0;
 let currentUser = '';
 
-const BUCKET_ID = 'D5muCX1tMoaq7Rv7ExRdSi'; 
-const LB_API = `https://kvdb.io/${BUCKET_ID}/leaderboard_400`;
+const BUCKET_ID = '6kNZDaHFZF6UGqBLuepyAh'; 
+const LB_API = `https://kvdb.io/${BUCKET_ID}/lb_v1_400`;
 
 // ---- Init ----
 async function init() {
