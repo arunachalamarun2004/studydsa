@@ -6,6 +6,12 @@ const DATA = [
 {
   name:"Arrays", short:"Arrays",
   patterns:[
+    {label:"📚 Java Collections: ArrayList & Arrays", problems:[
+      {n:"ArrayList initialization & add/get/remove",lc:0,d:"E",star:true},
+      {n:"Arrays.sort() and Arrays.fill()",lc:0,d:"E"},
+      {n:"Converting Array to ArrayList (asList)",lc:0,d:"E"},
+      {n:"Collections.reverse() and Collections.max()",lc:0,d:"E"},
+    ]},
     {label:"Traversal & Basic", problems:[
       {n:"Two Sum",lc:1,d:"E",star:true},
       {n:"Best Time to Buy and Sell Stock",lc:121,d:"E",star:true},
@@ -71,6 +77,12 @@ const DATA = [
 {
   name:"Strings", short:"Strings",
   patterns:[
+    {label:"📚 Java Basics: String & StringBuilder", problems:[
+      {n:"String immutability vs StringBuilder",lc:0,d:"E",star:true},
+      {n:"sb.append(), sb.reverse(), sb.toString()",lc:0,d:"E"},
+      {n:"s.toCharArray() and s.substring()",lc:0,d:"E"},
+      {n:"s.equals() vs == in Java",lc:0,d:"E"},
+    ]},
     {label:"Basic String Ops", problems:[
       {n:"Reverse String",lc:344,d:"E"},
       {n:"Reverse Vowels of a String",lc:345,d:"E"},
@@ -331,6 +343,11 @@ const DATA = [
 {
   name:"Linked List", short:"Linked List",
   patterns:[
+    {label:"📚 Java Collections: LinkedList", problems:[
+      {n:"LinkedList vs ArrayList (Time Complexity)",lc:0,d:"E",star:true},
+      {n:"list.addFirst(), list.addLast()",lc:0,d:"E"},
+      {n:"list.peek() vs list.poll()",lc:0,d:"E"},
+    ]},
     {label:"Basic Operations", problems:[
       {n:"Reverse Linked List",lc:206,d:"E",star:true},
       {n:"Merge Two Sorted Lists",lc:21,d:"E",star:true},
@@ -396,6 +413,11 @@ const DATA = [
 {
   name:"Stack & Queue", short:"Stack/Queue",
   patterns:[
+    {label:"📚 Java Collections: Stack, Queue, Deque", problems:[
+      {n:"Stack class (push, pop, peek)",lc:0,d:"E",star:true},
+      {n:"Queue interface & LinkedList/ArrayDeque",lc:0,d:"E",star:true},
+      {n:"Deque for Sliding Window (ArrayDeque)",lc:0,d:"E"},
+    ]},
     {label:"Stack Basics", problems:[
       {n:"Valid Parentheses",lc:20,d:"E",star:true},
       {n:"Min Stack",lc:155,d:"M",star:true},
