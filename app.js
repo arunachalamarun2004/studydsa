@@ -818,21 +818,30 @@ async function getLeaderboard() {
 async function saveToLeaderboard() {
   if (!currentUser) return;
   const pct = calcOverallPct();
+  console.log('Syncing progress:', pct + '%');
   let lb = await getLeaderboard();
   const idx = lb.findIndex(u => u.name.toLowerCase() === currentUser.toLowerCase());
+  
   if (idx >= 0) {
-    if (lb[idx].pct >= pct) return;
+    // Update if different
+    if (lb[idx].pct === pct) return; 
     lb[idx].pct = pct;
     lb[idx].updated = Date.now();
   } else {
     lb.push({ name: currentUser, pct, updated: Date.now() });
   }
+  
   lb.sort((a,b) => b.pct - a.pct);
   lb = lb.slice(0, 50); 
   try {
-    await fetch(LB_API, { method: 'POST', body: JSON.stringify(lb) });
-    localStorage.setItem('dsa400_lb_fallback', JSON.stringify(lb));
-  } catch(e) {}
+    const res = await fetch(LB_API, { method: 'POST', body: JSON.stringify(lb) });
+    if (res.ok) {
+      console.log('Leaderboard sync successful');
+      localStorage.setItem('dsa400_lb_fallback', JSON.stringify(lb));
+    }
+  } catch(e) {
+    console.error('Leaderboard sync failed:', e);
+  }
 }
 
 async function openLeaderboard() {
