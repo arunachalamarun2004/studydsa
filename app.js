@@ -521,6 +521,91 @@ const DATA = [
       {n:"Maximum Product of the Length of Two Palindromic Substrings",lc:1960,d:"M"},
       {n:"Minimum ASCII Delete Sum for Two Strings",lc:712,d:"M"},
     ]}
+  {
+  name:"Trees", short:"Trees",
+  patterns:[
+    {label:"DFS (In/Pre/Post)", problems:[
+      {n:"Maximum Depth of Binary Tree",lc:104,d:"E",star:true},
+      {n:"Minimum Depth of Binary Tree",lc:111,d:"E"},
+      {n:"Same Tree",lc:100,d:"E"},
+      {n:"Invert Binary Tree",lc:226,d:"E",star:true},
+      {n:"Balanced Binary Tree",lc:110,d:"E"},
+      {n:"Path Sum",lc:112,d:"E"},
+      {n:"Diameter of Binary Tree",lc:543,d:"E",star:true},
+      {n:"Lowest Common Ancestor",lc:236,d:"M",star:true},
+      {n:"Binary Tree Maximum Path Sum",lc:124,d:"H"},
+      {n:"Flatten Binary Tree to Linked List",lc:114,d:"M"},
+    ]},
+    {label:"BFS (Level Order)", problems:[
+      {n:"Binary Tree Level Order Traversal",lc:102,d:"M",star:true},
+      {n:"Binary Tree Right Side View",lc:199,d:"M",star:true},
+      {n:"Average of Levels in Binary Tree",lc:637,d:"E"},
+      {n:"Binary Tree Zigzag Level Order Traversal",lc:103,d:"M"},
+      {n:"Populating Next Right Pointers",lc:116,d:"M"},
+      {n:"Maximum Level Sum of a Binary Tree",lc:1161,d:"M"},
+      {n:"Binary Tree Vertical Order Traversal",lc:314,d:"M"},
+      {n:"Find Bottom Left Tree Value",lc:513,d:"M"},
+      {n:"Cousins in Binary Tree",lc:993,d:"E"},
+      {n:"Serialize and Deserialize Binary Tree",lc:297,d:"H"},
+    ]},
+    {label:"BST (Search Trees)", problems:[
+      {n:"Validate Binary Search Tree",lc:98,d:"M",star:true},
+      {n:"Kth Smallest Element in a BST",lc:230,d:"M",star:true},
+      {n:"Search in a Binary Search Tree",lc:700,d:"E"},
+      {n:"Insert into a Binary Search Tree",lc:701,d:"M"},
+      {n:"Delete Node in a BST",lc:450,d:"M"},
+      {n:"Convert Sorted Array to BST",lc:108,d:"E"},
+      {n:"Binary Search Tree Iterator",lc:173,d:"M"},
+      {n:"Lowest Common Ancestor of a BST",lc:235,d:"M"},
+      {n:"Range Sum of BST",lc:938,d:"E"},
+      {n:"All Elements in Two Binary Search Trees",lc:1305,d:"M"},
+    ]}
+  ]
+},
+{
+  name:"Graphs", short:"Graphs",
+  patterns:[
+    {label:"BFS & DFS Basics", problems:[
+      {n:"Number of Islands",lc:200,d:"M",star:true},
+      {n:"Flood Fill",lc:733,d:"E",star:true},
+      {n:"Clone Graph",lc:133,d:"M",star:true},
+      {n:"Rotting Oranges",lc:994,d:"M",star:true},
+      {n:"Max Area of Island",lc:695,d:"M"},
+      {n:"Surrounding Regions",lc:130,d:"M"},
+      {n:"Is Graph Bipartite?",lc:785,d:"M"},
+      {n:"Pacific Atlantic Water Flow",lc:417,d:"M"},
+      {n:"Number of Enclaves",lc:1020,d:"M"},
+      {n:"Number of Closed Islands",lc:1254,d:"M"},
+    ]},
+    {label:"Cycles & Topology", problems:[
+      {n:"Course Schedule",lc:207,d:"M",star:true},
+      {n:"Course Schedule II",lc:210,d:"M",star:true},
+      {n:"Find Eventual Safe States",lc:802,d:"M"},
+      {n:"Graph Valid Tree",lc:261,d:"M"},
+      {n:"Detect Cycle in Directed Graph",lc:207,d:"M"},
+      {n:"Detect Cycle in Undirected Graph",lc:684,d:"M"},
+      {n:"Alien Dictionary",lc:269,d:"H"},
+      {n:"All Paths From Source to Target",lc:797,d:"M"},
+      {n:"Longest Cycle in a Graph",lc:2359,d:"H"},
+      {n:"Shortest Path in Binary Matrix",lc:1091,d:"M"},
+    ]}
+  ]
+},
+{
+  name:"Greedy", short:"Greedy",
+  patterns:[
+    {label:"Decision Making", problems:[
+      {n:"Jump Game",lc:55,d:"M",star:true},
+      {n:"Jump Game II",lc:45,d:"M",star:true},
+      {n:"Gas Station",lc:134,d:"M",star:true},
+      {n:"Candy",lc:135,d:"H"},
+      {n:"Assign Cookies",lc:455,d:"E"},
+      {n:"Lemonade Change",lc:860,d:"E"},
+      {n:"Task Scheduler",lc:621,d:"M"},
+      {n:"Hand of Straights",lc:846,d:"M"},
+      {n:"Minimum Number of Taps to Water Garden",lc:1326,d:"H"},
+      {n:"Maximum Profits in Job Scheduling",lc:1235,d:"H"},
+    ]}
   ]
 }
 ];
@@ -557,32 +642,32 @@ function save() {
 
 // ---- Progress calculation ----
 function calcOverallPct() {
-  let total = 400; // Fixed total
-  let done = 0;
+  let total = 0, done = 0;
   DATA.forEach((t, ti) => {
     t.patterns.forEach((p, pi) => {
       p.problems.forEach((prob, i) => {
+        total++;
         if (ck[ti + '-' + pi + '-' + i]) done++;
       });
     });
   });
-  return Math.round(done / total * 100);
+  return total ? Math.round(done / total * 100) : 0;
 }
 
 function getTopicProgress(ti) {
-  let total = 50; // Each topic has 50 problems in this dataset
-  let done = 0;
+  let total = 0, done = 0;
   DATA[ti].patterns.forEach((p, pi) => {
     p.problems.forEach((prob, i) => {
+      total++;
       if (ck[ti + '-' + pi + '-' + i]) done++;
     });
   });
-  return { done, total, pct: Math.round(done / total * 100) };
+  return { done, total, pct: total ? Math.round(done / total * 100) : 0 };
 }
 
 // ---- Stats bar ----
 function updateStats() {
-  let total = 400, solved = 0, mustDone = 0, totalMust = 0;
+  let solved = 0, mustDone = 0, totalMust = 0;
   DATA.forEach((t, ti) => {
     t.patterns.forEach((p, pi) => {
       p.problems.forEach((prob, i) => {
@@ -596,7 +681,7 @@ function updateStats() {
   });
   
   document.getElementById('tasks-done').textContent = solved;
-  document.getElementById('probs-done').textContent = mustDone; // Using "problems solved" slot for "must-do"
+  document.getElementById('probs-done').textContent = mustDone;
   document.querySelector('#stat-day .stat-label').textContent = "Must-Do Done";
   document.getElementById('cur-day').textContent = mustDone + '/' + totalMust;
   
@@ -614,7 +699,7 @@ function buildNav() {
     let cls = 'dn';
     if (i === curTopic) cls += ' on';
     const prog = getTopicProgress(i);
-    if (prog.done === prog.total) cls += ' comp';
+    if (prog.done === prog.total && prog.total > 0) cls += ' comp';
     
     btn.className = cls;
     btn.innerHTML = `${t.short}<br><small style="font-size:9px;opacity:0.8">${prog.done}/${prog.total}</small>`;
@@ -649,10 +734,11 @@ function renderTopic() {
     
     p.problems.forEach((prob, i) => {
       const isDone = !!ck[curTopic + '-' + pi + '-' + i];
+      const lcUrl = `https://leetcode.com/problems/${prob.n.toLowerCase().replace(/ /g, '-')}/`;
       html += `
         <label class="task${isDone ? ' done' : ''}">
           <input type="checkbox" ${isDone ? 'checked' : ''} onchange="tog(${pi},${i},this)">
-          <span style="font-family:monospace; font-size:11px; color:#888; min-width:35px">#${prob.lc}</span>
+          <a href="${lcUrl}" target="_blank" class="prob-num" onclick="event.stopPropagation()" style="text-decoration:none; color:#888; font-family:monospace; font-size:11px; min-width:35px">#${prob.lc}</a>
           <span style="flex:1">${prob.star ? '<span style="color:#f59e0b; margin-right:4px">⭐</span>' : ''}${prob.n}</span>
           <span class="prob-diff ${prob.d}">${prob.d === 'E' ? 'Easy' : prob.d === 'M' ? 'Med' : 'Hard'}</span>
         </label>`;
@@ -663,7 +749,6 @@ function renderTopic() {
 
   html += `</div>`;
   
-  // Topic navigation
   const prev = curTopic > 0
     ? `<button class="nav-btn" onclick="goTopic(${curTopic-1})">← ${DATA[curTopic-1].short}</button>` : '';
   const next = curTopic < DATA.length - 1
