@@ -521,6 +521,8 @@ const DATA = [
       {n:"Maximum Product of the Length of Two Palindromic Substrings",lc:1960,d:"M"},
       {n:"Minimum ASCII Delete Sum for Two Strings",lc:712,d:"M"},
     ]}
+    ]
+  },
   {
   name:"Trees", short:"Trees",
   patterns:[
