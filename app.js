@@ -290,12 +290,9 @@ function tog(type, idx, el) {
 function goDay(i) { curDay = i; buildNav(); renderDay(); }
 
 // ---- Leaderboard (Global via KVDB.io) ----
-// I've generated a unique ID for your project's leaderboard
-const BUCKET_ID = 'dsa_roadmap_' + Math.random().toString(36).substring(2, 15); 
-// Note: In a real app, you'd hardcode a fixed ID here. 
-// Let's use a fixed one so everyone sees the same list:
-const SHARED_BUCKET_ID = 'studydsa_leaderboard_v1'; 
-const LB_API = `https://kvdb.io/6Z4W7s4s1qYf1z4s1qYf1z/${SHARED_BUCKET_ID}`;
+// Fresh verified bucket for studydsa
+const BUCKET_ID = 'D5muCX1tMoaq7Rv7ExRdSi'; 
+const LB_API = `https://kvdb.io/${BUCKET_ID}/leaderboard`;
 
 async function getLeaderboard() {
   try {
