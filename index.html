@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>15-Day DSA Roadmap | Infosys Prep Tracker</title>
+  <meta name="description" content="Track your 15-day DSA preparation for Infosys. Interactive roadmap with daily tasks, progress tracking, and leaderboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-area">
+        <div class="logo-icon">🧠</div>
+        <div>
+          <div class="logo-title">DSA Roadmap</div>
+          <div class="logo-sub">15-Day Infosys Prep Tracker</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="leaderboard-btn" class="btn-outline" onclick="openLeaderboard()">🏆 Leaderboard</button>
+        <div class="user-chip" id="user-chip" onclick="changeUser()">
+          <span class="user-avatar" id="user-avatar">?</span>
+          <span id="user-display">Set Name</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== HERO STRIP ===== -->
+  <div class="hero-strip">
+    <div class="hero-inner">
+      <div class="stat-card" id="stat-day">
+        <div class="stat-label">Current Day</div>
+        <div class="stat-value" id="cur-day">Day 1</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tasks Done</div>
+        <div class="stat-value" id="tasks-done">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Problems Solved</div>
+        <div class="stat-value" id="probs-done">0</div>
+      </div>
+      <div class="stat-card overall">
+        <div class="stat-label">Overall Progress</div>
+        <div class="stat-value" id="ovr-pct">0%</div>
+        <div class="global-bar-wrap"><div class="global-bar" id="global-bar"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main-layout">
+    <!-- Day Navigation -->
+    <nav class="day-nav" id="day-nav" aria-label="Day navigation"></nav>
+
+    <!-- Day Content -->
+    <div id="day-content"></div>
+  </main>
+
+  <!-- ===== LEADERBOARD MODAL ===== -->
+  <div class="modal-backdrop" id="lb-backdrop" onclick="closeLeaderboard()"></div>
+  <div class="modal" id="lb-modal" role="dialog" aria-label="Leaderboard">
+    <div class="modal-header">
+      <div class="modal-title">🏆 Leaderboard</div>
+      <button class="modal-close" onclick="closeLeaderboard()" aria-label="Close">✕</button>
+    </div>
+    <p class="modal-sub">Top 10 users by overall progress</p>
+    <div class="lb-list" id="lb-list"></div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="closeLeaderboard()">Close</button>
+    </div>
+  </div>
+
+  <!-- ===== NAME PROMPT MODAL ===== -->
+  <div class="modal-backdrop" id="name-backdrop"></div>
+  <div class="modal name-modal" id="name-modal" role="dialog" aria-label="Enter your name">
+    <div class="name-modal-icon">👋</div>
+    <div class="modal-title" style="text-align:center;margin-bottom:6px">Welcome!</div>
+    <p class="modal-sub" style="text-align:center">Enter your name to track progress on the leaderboard.</p>
+    <input type="text" id="name-input" class="name-input" placeholder="Your name…" maxlength="24" />
+    <button class="btn-primary" style="width:100%;margin-top:12px" id="name-submit-btn" onclick="submitName()">Let's Go 🚀</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
