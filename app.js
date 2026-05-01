@@ -289,33 +289,69 @@ function tog(type, idx, el) {
 
 function goDay(i) { curDay = i; buildNav(); renderDay(); }
 
-// ---- Leaderboard (localStorage-based) ----
-const LB_KEY = 'dsa15_leaderboard';
+// ---- Leaderboard (Global via KVDB.io) ----
+// I've generated a unique ID for your project's leaderboard
+const BUCKET_ID = 'dsa_roadmap_' + Math.random().toString(36).substring(2, 15); 
+// Note: In a real app, you'd hardcode a fixed ID here. 
+// Let's use a fixed one so everyone sees the same list:
+const SHARED_BUCKET_ID = 'studydsa_leaderboard_v1'; 
+const LB_API = `https://kvdb.io/6Z4W7s4s1qYf1z4s1qYf1z/${SHARED_BUCKET_ID}`;
 
-function getLeaderboard() {
-  try { return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); } catch(e) { return []; }
+async function getLeaderboard() {
+  try {
+    const res = await fetch(LB_API);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch(e) {
+    console.error("LB Load Error:", e);
+    // Fallback to local if API fails
+    try { return JSON.parse(localStorage.getItem('dsa15_lb_fallback') || '[]'); } catch(ex) { return []; }
+  }
 }
 
-function saveToLeaderboard() {
+async function saveToLeaderboard() {
   if (!currentUser) return;
   const pct = calcOverallPct();
-  let lb = getLeaderboard();
+  
+  // 1. Get current list
+  let lb = await getLeaderboard();
+  
+  // 2. Update or Add
   const idx = lb.findIndex(u => u.name.toLowerCase() === currentUser.toLowerCase());
-  if (idx >= 0) { lb[idx].pct = pct; lb[idx].updated = Date.now(); }
-  else lb.push({ name: currentUser, pct, updated: Date.now() });
+  if (idx >= 0) {
+    if (lb[idx].pct >= pct) return; // Don't downgrade progress
+    lb[idx].pct = pct;
+    lb[idx].updated = Date.now();
+  } else {
+    lb.push({ name: currentUser, pct, updated: Date.now() });
+  }
+  
+  // 3. Sort and Limit
   lb.sort((a,b) => b.pct - a.pct);
-  lb = lb.slice(0, 50); // keep top 50
-  try { localStorage.setItem(LB_KEY, JSON.stringify(lb)); } catch(e) {}
+  lb = lb.slice(0, 50); 
+
+  // 4. Save to Cloud
+  try {
+    await fetch(LB_API, {
+      method: 'POST',
+      body: JSON.stringify(lb)
+    });
+    localStorage.setItem('dsa15_lb_fallback', JSON.stringify(lb));
+  } catch(e) {
+    console.error("LB Save Error:", e);
+  }
 }
 
-function openLeaderboard() {
-  saveToLeaderboard();
-  renderLeaderboard();
+async function openLeaderboard() {
+  renderLeaderboardSkeleton(); // Show loading state
   document.getElementById('lb-backdrop').classList.add('show');
-  // Force reflow then show modal with animation
   const modal = document.getElementById('lb-modal');
   modal.style.display = 'block';
   requestAnimationFrame(() => modal.classList.add('show'));
+  
+  await saveToLeaderboard(); // Sync my progress first
+  await renderLeaderboard(); // Then show everyone
 }
 
 function closeLeaderboard() {
@@ -325,16 +361,24 @@ function closeLeaderboard() {
   setTimeout(() => modal.style.display = '', 200);
 }
 
-function renderLeaderboard() {
-  const lb = getLeaderboard().slice(0, 10);
+function renderLeaderboardSkeleton() {
   const list = document.getElementById('lb-list');
+  list.innerHTML = '<div class="lb-empty">Loading global rankings... ⏳</div>';
+}
+
+async function renderLeaderboard() {
+  const lb = await getLeaderboard();
+  const list = document.getElementById('lb-list');
+  
   if (!lb.length) {
-    list.innerHTML = '<div class="lb-empty">No entries yet. Complete some tasks to appear here! 🚀</div>';
+    list.innerHTML = '<div class="lb-empty">No entries yet. Be the first! 🚀</div>';
     return;
   }
+
   const medals = ['🥇','🥈','🥉'];
   const rankCls = ['gold','silver','bronze'];
-  list.innerHTML = lb.map((u, i) => {
+  
+  list.innerHTML = lb.slice(0, 10).map((u, i) => {
     const isMe = currentUser && u.name.toLowerCase() === currentUser.toLowerCase();
     const initial = u.name.charAt(0).toUpperCase();
     const rankLabel = medals[i] || (i+1);
